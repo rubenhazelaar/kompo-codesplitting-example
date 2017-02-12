@@ -1,0 +1,22 @@
+{
+  "name": "kompo-codesplitting",
+  "version": "1.0.0",
+  "description": "Example for code splitting using Webpack 2 and Kompo",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "./node_modules/.bin/webpack",
+    "watch": "./node_modules/.bin/webpack -w"
+  },
+  "author": "Ruben Hazelaar <ruben.hazelaar@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.22.1",
+    "babel-loader": "^6.2.10",
+    "babel-preset-env": "^1.1.8",
+    "webpack": "^2.2.1"
+  },
+  "dependencies": {
+    "kompo": "^1.2.1"
+  }
+}
