@@ -131,13 +131,13 @@
 /******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
 
 /******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
+/******/ 	__webpack_require__.p = "/";
 
 /******/ 	// on error function for async loading
 /******/ 	__webpack_require__.oe = function(err) { console.error(err); throw err; };
 
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 11);
+/******/ 	return __webpack_require__(__webpack_require__.s = 12);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -258,26 +258,21 @@ function update(Element) {
         state = selector ? selector(Element.__kompo__.state) : Element.__kompo__.state,
         isRoot = Element === Element.__kompo__.root;
 
-    for (var i = 0, l = mounts.length; i < l; ++i) {
-        render(mounts[i]);
-    }
-
     // State is false, do not run statefulls
-    if (!state) return;
+    if (state) {
+        // If is object and flagged dirty or not at all than do not update
+        var checkIfDirty = _hasProxy2.default ? (0, _isObject2.default)(state) || Array.isArray(state) : (0, _isObject2.default)(state) && !Array.isArray(state);
 
-    // If is object and flagged dirty or not at all than do not update
-    var checkIfDirty = _hasProxy2.default ? (0, _isObject2.default)(state) || Array.isArray(state) : (0, _isObject2.default)(state) && !Array.isArray(state);
-
-    if (checkIfDirty && state.hasOwnProperty('__kompo_dirty__') && state.__kompo_dirty__.length === 0) {
-        if (isRoot) {
-            (0, _observe.markClean)(state);
+        if (!(checkIfDirty && state.hasOwnProperty('__kompo_dirty__') && state.__kompo_dirty__.length === 0)) {
+            var statefulls = kompo.statefulls;
+            for (var i = 0, l = statefulls.length; i < l; ++i) {
+                statefulls[i](state, Element);
+            }
         }
-        return;
     }
 
-    var statefulls = kompo.statefulls;
-    for (var _i = 0, _l = statefulls.length; _i < _l; ++_i) {
-        statefulls[_i](state, Element);
+    for (var _i = 0, _l = mounts.length; _i < _l; ++_i) {
+        render(mounts[_i]);
     }
 
     if (isRoot) {
@@ -386,12 +381,12 @@ function react(Element, statefull) {
 }
 
 /**
- * Mimics the slot functionality of 
+ * Mimics the slot functionality of
  * Web Components
- * 
- * Slots are named, their name & location is 
+ *
+ * Slots are named, their name & location is
  * predefined in the component.
- * 
+ *
  * @param Element
  * @param name
  * @param cb
@@ -406,7 +401,7 @@ function slot(Element, name, cb) {
 
 /**
  * Checks whether a slot with the given name exists
- * 
+ *
  * @param Element
  * @param name
  * @returns {boolean}
@@ -416,9 +411,9 @@ function hasSlot(Element, name) {
 }
 
 /**
- * Gets the router from an Element. The router is 
+ * Gets the router from an Element. The router is
  * add globally to the Element prototype
- * 
+ *
  * @param Element
  * @returns {router}
  */
@@ -430,7 +425,7 @@ function getRouter(Element) {
  * Adds properties to an existing component,
  * making it possible to compose a component with
  * different behavior.
- * 
+ *
  * @param constructComponent
  * @param composeProps
  * @returns {function()}
@@ -520,15 +515,15 @@ var _component = __webpack_require__(0);
 
 var _component2 = _interopRequireDefault(_component);
 
-var _router = __webpack_require__(8);
+var _router = __webpack_require__(9);
 
 var _router2 = _interopRequireDefault(_router);
 
-var _app = __webpack_require__(9);
+var _app = __webpack_require__(10);
 
 var _app2 = _interopRequireDefault(_app);
 
-var _dispatch = __webpack_require__(10);
+var _dispatch = __webpack_require__(11);
 
 var _dispatch2 = _interopRequireDefault(_dispatch);
 
@@ -547,6 +542,10 @@ var _isObject2 = _interopRequireDefault(_isObject);
 var _merge = __webpack_require__(5);
 
 var _merge2 = _interopRequireDefault(_merge);
+
+var _isFunction = __webpack_require__(7);
+
+var _isFunction2 = _interopRequireDefault(_isFunction);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -569,7 +568,8 @@ var state = {
 var util = {
     hasProxy: _hasProxy2.default,
     isObject: _isObject2.default,
-    merge: _merge2.default
+    merge: _merge2.default,
+    isFunction: _isFunction2.default
 };
 
 exports.default = {
@@ -797,7 +797,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 exports.default = isObject;
 
@@ -861,21 +861,58 @@ function merge() {
 }
 
 /***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/* 6 */,
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_kompo__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_kompo___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_kompo__);
 
-const { construct, getRouter, react } = __WEBPACK_IMPORTED_MODULE_0_kompo___default.a;
 
-/* harmony default export */ __webpack_exports__["a"] = construct('div', function ({ heading, paramIndex }) {
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = isFunction;
+
+/**
+ * Checks if given variable is a function
+ *
+ * @param {*} functionToCheck
+ * @returns {boolean}
+ */
+function isFunction(functionToCheck) {
+  var getType = {};
+  return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
+}
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _kompo = __webpack_require__(1);
+
+var _kompo2 = _interopRequireDefault(_kompo);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var construct = _kompo2.default.construct,
+    getRouter = _kompo2.default.getRouter,
+    react = _kompo2.default.react;
+exports.default = construct('div', function (_ref) {
+    var heading = _ref.heading,
+        paramIndex = _ref.paramIndex;
+
     this.setAttribute('data-type', 'Leaf');
 
     // Create Elements
-    const h2 = document.createElement('h2'),
-          span = document.createElement('span');
+    var h2 = document.createElement('h2'),
+        span = document.createElement('span');
 
     h2.textContent = heading;
 
@@ -883,11 +920,11 @@ const { construct, getRouter, react } = __WEBPACK_IMPORTED_MODULE_0_kompo___defa
     this.appendChild(h2);
     this.appendChild(span);
 
-    const r = getRouter(this);
+    var r = getRouter(this);
 
     // Show parameter if it is set
-    react(this, () => {
-        const params = r.getParams();
+    react(this, function () {
+        var params = r.getParams();
         if (params.length > 0) {
             span.textContent = 'Param at index ' + paramIndex + ' = ' + params[paramIndex];
         }
@@ -898,8 +935,7 @@ const { construct, getRouter, react } = __WEBPACK_IMPORTED_MODULE_0_kompo___defa
 });
 
 /***/ }),
-/* 7 */,
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -918,6 +954,10 @@ var _merge = __webpack_require__(5);
 var _merge2 = _interopRequireDefault(_merge);
 
 var _component = __webpack_require__(0);
+
+var _isFunction = __webpack_require__(7);
+
+var _isFunction2 = _interopRequireDefault(_isFunction);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -984,7 +1024,7 @@ function construct(props) {
 
         if (routeComponent instanceof Element) {
             routeComponent.kompo.level = level;
-        } else if (routeComponent instanceof Promise) {
+        } else if (routeComponent instanceof Promise || (0, _isFunction2.default)(routeComponent)) {
             // Set a level to the promise
             routeComponent.kompo = { level: level };
         }
@@ -1039,6 +1079,16 @@ function construct(props) {
             return params;
         },
         isUrl: isUrl,
+        getUrl: function getUrl() {
+            return url;
+        },
+        setTo: function setTo(u) {
+            u = u.replace(base, '');
+            if (isUrl(u)) return false;
+
+            setUrl(u);
+            return true;
+        },
         goTo: function goTo(u) {
             var title = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
             var data = arguments.length <= 2 || arguments[2] === undefined ? null : arguments[2];
@@ -1055,15 +1105,17 @@ function construct(props) {
                 index = parent.kompo.level + 1;
             }
 
+            var m = match(url, routes);
+
             if (depth) {
-                return match(url, routes).slice(index, index + depth);
+                if (depth < 0) return m.slice(index - depth, index + 1);
+                return m.slice(index, index + depth);
             } else {
-                return match(url, routes)[index];
+                return m[index];
             }
         }
     };
 }
-
 function route(path, component, children) {
     return {
         path: path, component: component, children: children
@@ -1075,35 +1127,59 @@ function indexRoute(component) {
 }
 
 function swap(component, router, element) {
-    var c = router.get(component);
+    var c = router.get(component),
+        fn = void 0;
 
     if (c) {
+        if ((0, _isFunction2.default)(c)) {
+            {
+                fn = c;
+                c = _toPromise(c);
+            }
+        }
+
         if (c instanceof Element) {
             _swap(component, c, element);
         } else if (c instanceof Promise) {
-            c.then(function (rc) {
-                rc.kompo.level = c.kompo.level;
-
-                _swap(component, rc, element);
-            }).catch(function () {
-                console.error("Cannot dynamically load module for route");
-            });
+            if (c.kompo.resolved) {
+                _swap(component, c.kompo.resolved, element);
+            } else {
+                c.then(function (rc) {
+                    rc.kompo.level = c.kompo.level;
+                    _swap(component, rc, element, true);
+                    c.kompo.resolved = rc;
+                    if (fn) fn.kompo.resolved = rc;
+                }).catch(function () {
+                    console.error("Cannot dynamically load module for route");
+                });
+            }
         }
     }
 }
 
+function _toPromise(fn) {
+    var pr = fn();
+
+    // Transfer kompo object including level to the promise
+    pr.kompo = fn.kompo;
+
+    return pr;
+}
+
 function _swap(parent, routedComponent, element) {
+    var renderWithRouted = arguments.length <= 3 || arguments[3] === undefined ? false : arguments[3];
+
     var routed = parent.kompo.routed,
         el = element ? element : parent;
 
     if (routed) {
+        if (renderWithRouted) (0, _component.render)(routedComponent);
         el.replaceChild(routedComponent, routed);
         parent.kompo.mounts.splice(parent.kompo.mounts.indexOf(routed, 1));
     } else {
+        (0, _component.render)(routedComponent);
         el.appendChild(routedComponent);
     }
-
-    (0, _component.render)(routedComponent);
 
     if (parent.kompo.mounts.indexOf(routedComponent) == -1) {
         parent.kompo.mounts.push(routedComponent);
@@ -1113,7 +1189,7 @@ function _swap(parent, routedComponent, element) {
 }
 
 /***/ }),
-/* 9 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1156,7 +1232,7 @@ function app(root, state, router) {
 }
 
 /***/ }),
-/* 10 */
+/* 11 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1182,47 +1258,65 @@ function dispatch(Element, cb, noRender) {
 }
 
 /***/ }),
-/* 11 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_kompo__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_kompo___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_kompo__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__components_leaf__ = __webpack_require__(6);
-// Component and content creation classes and functions
 
-const { construct, react, getRouter } = __WEBPACK_IMPORTED_MODULE_0_kompo___default.a,
-      { dispatch, app } = __WEBPACK_IMPORTED_MODULE_0_kompo__["state"];
+
+var _kompo = __webpack_require__(1);
+
+var _kompo2 = _interopRequireDefault(_kompo);
+
+var _leaf = __webpack_require__(8);
+
+var _leaf2 = _interopRequireDefault(_leaf);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var construct = _kompo2.default.construct,
+    react = _kompo2.default.react,
+    getRouter = _kompo2.default.getRouter,
+    dispatch = _kompo.state.dispatch,
+    app = _kompo.state.app;
 
 // Router classes and components
-const { route, indexRoute, swap } = __WEBPACK_IMPORTED_MODULE_0_kompo__["router"];
+// Component and content creation classes and functions
+
+var route = _kompo.router.route,
+    indexRoute = _kompo.router.indexRoute,
+    swap = _kompo.router.swap;
 
 // Example components with self-explanatory name
 
-
 // Create root construct for navigation
-const root = construct('div', function () {
-    const h1 = document.createElement('h1'),
-          nav = document.createElement('nav'),
-          links = ['', 'simple', 'param/123', 'branch', 'branch/simple', 'rooted_nested', 'nonexisting'],
-          r = getRouter(this);
+var root = construct('div', function () {
+    var _this = this;
+
+    var h1 = document.createElement('h1'),
+        nav = document.createElement('nav'),
+        links = ['', 'simple', 'param/123', 'branch', 'branch/leaf', 'branch/branch', 'branch/branch/leaf', 'rooted_nested', 'nonexisting'],
+        r = getRouter(this);
 
     h1.textContent = 'Router example';
 
-    for (let i = 0, l = links.length; i < l; ++i) {
-        const a = document.createElement('a');
-        a.addEventListener('click', () => {
+    var _loop = function _loop(i, l) {
+        var a = document.createElement('a');
+        a.addEventListener('click', function () {
             r.goTo(links[i]);
 
             // Dispatch change to state
-            dispatch(this, state => {
+            dispatch(_this, function (state) {
                 state.url = links[i];
             });
         });
         a.setAttribute('href', 'javascript:void(0);');
         a.textContent = links[i];
         nav.appendChild(a);
+    };
+
+    for (var i = 0, l = links.length; i < l; ++i) {
+        _loop(i, l);
     }
 
     this.appendChild(h1);
@@ -1230,44 +1324,59 @@ const root = construct('div', function () {
 
     // On update swap the new
     // routed construct
-    react(this, () => {
+    react(this, function () {
         console.log("LEVEL ONE SWAP ");
-        swap(this, r);
+        swap(_this, r);
     });
 });
 
 // Create route structure
-const routes = route('/', root(), [
+var routes = route('/', root(), [
 // Each route array needs a IndexRoute
-indexRoute(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_leaf__["a" /* default */])({
+indexRoute((0, _leaf2.default)({
     heading: 'Index construct'
-})), route('simple', __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_leaf__["a" /* default */])({
+})), route('simple', (0, _leaf2.default)({
     heading: 'Simple construct'
-})), route('param/:param', __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_leaf__["a" /* default */])({
+})), route('param/:param', (0, _leaf2.default)({
     heading: 'Route with a param, shown in Component'
 })), route('branch', //branch()
 // To dynamically load a component
 // IMPORTANT: does not work as intended with the setup in examples.webpack.js
-__webpack_require__.e/* require.ensure */(0).then((require => __webpack_require__(7).default({ heading: "Dynamically imported" })).bind(null, __webpack_require__)).catch(__webpack_require__.oe), [indexRoute(__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_leaf__["a" /* default */])({
+function () {
+    return __webpack_require__.e/* require.ensure */(0).then((function (require) {
+        return __webpack_require__(6).default({ heading: "Dynamically imported" });
+    }).bind(null, __webpack_require__)).catch(__webpack_require__.oe);
+}, [indexRoute((0, _leaf2.default)({
     heading: 'Nested index construct',
     input: true
-})), route('simple', __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_leaf__["a" /* default */])({
+})), route('leaf', (0, _leaf2.default)({
     heading: 'Nested simple construct'
-}))
+})), route('branch', //branch()
+// To dynamically load a component
+// IMPORTANT: does not work as intended with the setup in examples.webpack.js
+function () {
+    return __webpack_require__.e/* require.ensure */(0).then((function (require) {
+        return __webpack_require__(6).default({ heading: "Nested dynamically imported" });
+    }).bind(null, __webpack_require__)).catch(__webpack_require__.oe);
+}, [indexRoute((0, _leaf2.default)({
+    heading: 'Double nested index construct',
+    input: true
+})), route('leaf', (0, _leaf2.default)({
+    heading: 'Double nested simple construct'
+}))])
 // Url is very simple, although it is a nested construct
-, route('/rooted_nested', __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__components_leaf__["a" /* default */])({
+, route('/rooted_nested', (0, _leaf2.default)({
     heading: 'Rooted nested construct'
 }))])]);
 
 // An empty state for this example.
 // A state is needed because it contains the router
-const st = { url: '/' };
+var st = { url: '/' };
 
 // Create router and set a not found Callback
-const r = __WEBPACK_IMPORTED_MODULE_0_kompo__["router"].construct({
-    routes,
-    base: 'router',
-    notFoundCallback: function (url) {
+var r = _kompo.router.construct({
+    routes: routes,
+    notFoundCallback: function notFoundCallback(url) {
         alert('Url: ' + url + ' not found');
         // Always throw an error to interrupt the update cycle
         throw new Error('Url: ' + url + ' not found');
@@ -1275,13 +1384,24 @@ const r = __WEBPACK_IMPORTED_MODULE_0_kompo__["router"].construct({
 });
 
 // Get the root construct from the router
-const ro = r.get();
+var ro = r.get();
 
 // Append to body
 document.body.appendChild(ro);
 
 // Set the state (including the router) to the root construct
 app(ro, st, r).start();
+
+// Listen to popstate event to make sure the page render when the
+// user goes through it's history
+window.addEventListener('popstate', function () {
+    // Just update the whole tree from the root up.
+    if (r.setTo(window.location.pathname)) {
+        dispatch(ro, function (state) {
+            state.url = r.getUrl();
+        });
+    }
+});
 
 /***/ })
 /******/ ]);

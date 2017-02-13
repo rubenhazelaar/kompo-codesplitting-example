@@ -1,30 +1,43 @@
 webpackJsonp([0],{
 
-/***/ 7:
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ 6:
+/***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_kompo__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_kompo___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_kompo__);
 
-const { construct, getRouter, react } = __WEBPACK_IMPORTED_MODULE_0_kompo___default.a;
-const { swap } = __WEBPACK_IMPORTED_MODULE_0_kompo__["router"];
 
-/* harmony default export */ __webpack_exports__["default"] = construct('div', function ({ heading }) {
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _kompo = __webpack_require__(1);
+
+var _kompo2 = _interopRequireDefault(_kompo);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var construct = _kompo2.default.construct,
+    getRouter = _kompo2.default.getRouter,
+    react = _kompo2.default.react;
+var swap = _kompo.router.swap;
+exports.default = construct('div', function (_ref) {
+    var _this = this;
+
+    var heading = _ref.heading;
+
     this.setAttribute('data-type', 'Branch');
 
     // Create Elements
-    const h2 = document.createElement('h2');
+    var h2 = document.createElement('h2');
     h2.textContent = heading;
 
     // Append children
     this.appendChild(h2);
 
-    const r = getRouter(this);
-    react(this, () => {
+    var r = getRouter(this);
+    react(this, function () {
         console.log("LEVEL TWO SWAP");
-        swap(this, r);
+        swap(_this, r);
     });
 }, {
     heading: 'Branch construct'

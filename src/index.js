@@ -18,7 +18,9 @@ const root = construct('div', function () {
             'simple',
             'param/123',
             'branch',
-            'branch/simple',
+            'branch/leaf',
+            'branch/branch',
+            'branch/branch/leaf',
             'rooted_nested',
             'nonexisting'
         ],
@@ -65,17 +67,28 @@ const routes = route('/', root(), [
         heading: 'Route with a param, shown in Component'
     }))
     , route('branch', //branch()
-        // To dynamically load a component
-        // IMPORTANT: does not work as intended with the setup in examples.webpack.js
+        // To dynamically load a component. Will be loaded directly after main bundle.
         require.ensure([], require => require('./components/branch').default({heading: "Dynamically imported"}), 'branch')
         , [
             indexRoute(leaf({
                 heading: 'Nested index construct',
                 input: true
             }))
-            , route('simple', leaf({
+            , route('leaf', leaf({
                 heading: 'Nested simple construct'
             }))
+            , route('branch', //branch()
+                // To do a delayed dynamic load of a component. Will be loaded when the route is activated.
+                () => require.ensure([], require => require('./components/branch').default({heading: "Nested dynamically imported"}), 'branch')
+                , [
+                    indexRoute(leaf({
+                        heading: 'Double nested index construct',
+                        input: true
+                    }))
+                    , route('leaf', leaf({
+                        heading: 'Double nested simple construct'
+                    }))
+                ])
             // Url is very simple, although it is a nested construct
             , route('/rooted_nested', leaf({
                 heading: 'Rooted nested construct'
@@ -90,7 +103,6 @@ const st = {url: '/'};
 // Create router and set a not found Callback
 const r = router.construct({
     routes,
-    base: 'router',
     notFoundCallback: function (url) {
         alert('Url: ' + url + ' not found');
         // Always throw an error to interrupt the update cycle
@@ -107,3 +119,13 @@ document.body.appendChild(ro);
 // Set the state (including the router) to the root construct
 app(ro, st, r).start();
 
+// Listen to popstate event to make sure the page render when the
+// user goes through it's history
+window.addEventListener('popstate', ()=>{
+    // Just update the whole tree from the root up.
+    if (r.setTo(window.location.pathname)) {
+        dispatch(ro, state => {
+            state.url = r.getUrl();
+        });
+    }
+});

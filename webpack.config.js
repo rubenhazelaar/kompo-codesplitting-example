@@ -4,6 +4,7 @@ module.exports = {
     cache: true,
     entry: './src/index.js',
     output: {
+        publicPath: "/",
         chunkFilename: '[name].js',
         path: path.resolve(__dirname, 'dist'),
         filename: '[name].js'
